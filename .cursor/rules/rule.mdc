@@ -1,0 +1,285 @@
+---
+alwaysApply: true
+---
+# 마스터 규칙
+
+이 문서는 Careplanner refactoring 작업 전반에 적용되는 기본 지침입니다. 모든 바이브코딩 단계에서 이 파일만 항상 로드하고, 여기에 정의된 로딩 규칙에 따라 상황별 규칙(.mdc)과 기획(.md) 문서를 추가로 참조합니다.
+
+## 규칙 로딩 프로세스
+1. **명령 해석**: 사용자가 전달한 문맥(기능명, 라우트, 컴포넌트, 페이지 등)에서 키워드를 추출합니다.
+2. **그룹 매핑**: 아래 표의 키워드를 기준으로 1차 그룹 규칙 파일을 선택합니다. 여러 키워드가 겹치면 우선순위는 사용자 지시 → 최근 문맥 → 공통 규칙 순입니다.
+3. **서식 매핑**: 문서 플로우/서식과 관련된 작업이면 그룹 규칙과 함께 해당 서식 규칙을 추가로 로드합니다.
+4. **예외 처리**: 매핑된 규칙 파일이 없는 경우, 명령 본문에 포함된 즉시 지시문을 그대로 따릅니다. 작업 후 `.cursor/plans/백로그/아이디어-메모.md`에 “추가 예정” 행을 남겨 추후 편입합니다.
+
+### 그룹 단위 키 매핑
+| 키워드(복수 선택 허용) | 기본 파일 | 주요 범위 |
+| --- | --- | --- |
+| 랜딩, Landing, 마케팅 CTA | `.cursor/rules/그룹/랜딩페이지.mdc` | LandingPage, DirectorPage, 방문자 전환, UTMs |
+| 결제, Billing, Subscription | `.cursor/rules/그룹/결제-기능.mdc` | 결제 UI, 요금제, 추후 billing API |
+| 로그인, Auth, 세션 | `.cursor/rules/그룹/로그인.mdc` | LoginPage, AuthCallback, RequireAuth |
+| 게스트, Guest | `.cursor/rules/그룹/게스트모드.mdc` | Guest 세션 제어, 제한, 전환 로직 |
+| Zustand, 전역 상태 | `.cursor/rules/그룹/전역상태관리-zustand.mdc` | `shared/lib/state/*`, store 동기화 규칙 |
+| Supabase, 서버, API | `.cursor/rules/그룹/서버-supabase-mcp.mdc` | API 래퍼, RLS, Auth 서비스, Edge Function |
+| 채팅, AI 케어플랜 | `.cursor/rules/그룹/채팅-AI케플.mdc` | ChatPanelContainer, chat-core, Mindmap |
+| Dev 요청, 피드백 보드 | `.cursor/rules/그룹/Dev요청보드.mdc` | `features/dev-request-board/*` |
+| 문서, Document flows 공통 | `.cursor/rules/그룹/문서-플로우-공통.mdc` | Panel 컨테이너, DocumentRoute factory |
+| 소속기관, Organization | `.cursor/rules/그룹/소속기관-관리.mdc` | Organization* 컴포넌트, 승인/조회 |
+| 디자인 시스템, Design System | `.cursor/rules/그룹/디자인-시스템.mdc` | longterm-design-system, 글로벌 스타일 |
+| 음성 녹음, Audio, Voice | `.cursor/rules/그룹/음성녹음.mdc` | 음성 캡처, 업로드, 전사 API |
+| 라우트, 레이아웃, Navigation | `.cursor/rules/그룹/라우트-레이아웃.mdc` | `navigation/*`, `routes/*.tsx`, 레이아웃 전환 |
+
+### 서식(문서 플로우) 키 매핑
+| 키워드 | 기본 파일 |
+| --- | --- |
+| 기초평가, 욕구사정기록지 | `.cursor/rules/서식/기초평가_욕구사정기록지.mdc` |
+| 사례회의, 사례관리회의록 | `.cursor/rules/서식/사례관리회의록.mdc` |
+| 관리회의, 운영위원회회의록 | `.cursor/rules/서식/운영위원회회의록.mdc` |
+| 급여계획, 급여제공계획서 | `.cursor/rules/서식/급여제공계획서.mdc` |
+| 서비스일정 | `.cursor/rules/서식/서비스일정.mdc` |
+| 직원회의, 직원회의록 | `.cursor/rules/서식/직원회의록.mdc` |
+| 업무일지, 업무수행일지 | `.cursor/rules/서식/업무수행일지.mdc` |
+
+## 템플릿 + 클립보드 지시
+- 규칙 파일에 아직 내용이 정리되지 않은 경우, 명령 본문에 직접 규칙을 작성해 적용합니다.
+- 즉시 지시 후 `.cursor/plans/백로그/아이디어-메모.md` 또는 대응 기획 문서에 “추가 예정” 섹션을 추가하고, 정기적으로 해당 내용을 적절한 규칙 파일에 편입합니다.
+- 새로운 규칙을 작성할 때는 `.cursor/rules/템플릿/규칙-작성-템플릿.md`를 복사해 사용합니다.
+
+## 자동화 포인트
+- 모든 규칙 파일 헤더에는 `version`, `lastUpdatedBy`, `lastUpdatedAt` 메타를 기록합니다.
+- `.cursor/rules/자동화/인덱스-생성기.md`에 간단한 스크립트/명령을 정리하여 규칙 목록을 자동으로 추출합니다.
+- 정기 점검 시 `.cursor/rules/자동화/정비-체크리스트.md`를 따라 누락/중복 규칙을 정리하고 `rules/변경기록.mdc`에 반영합니다.
+
+## 최소 필수 규칙만 분리
+- 반복적으로 참조되거나 위험도가 높은 규칙만 `rules` 하위 폴더에 편입합니다.
+- 일회성 또는 실험적 지시는 명령 내에 유지하고, 재사용 가치가 확인될 때만 정식 규칙 파일로 승격합니다.
+- 새로운 규칙을 바로 편입하기 어렵다면 `.cursor/rules/백로그/편입-대기-규칙.mdc`에 간단한 메모(맥락, 기대 효과, 만료 일자)를 남깁니다.
+
+## 기획(plans) 연동 규칙
+- 모든 기능별·서식별 기획 문서는 `.cursor/plans`에 저장되며, 동일한 그룹/서식 이름으로 구성되어 있습니다. 개발 시 해당 기능의 규칙뿐 아니라 연결된 기획 문서를 반드시 함께 참조합니다.
+- 기획 문서를 열람해야 하는 키워드는 rules 매핑과 동일하게 동작합니다. 예를 들어 “채팅” 관련 작업이면 `.cursor/rules/그룹/채팅-AI케플.mdc`와 `.cursor/plans/그룹/채팅-AI케플.md`를 동시에 참조합니다.
+- 바이브코딩 중 새 기획/스토리 지시가 내려오면, 우선 작업 명령에 따라 구현을 진행하되 동일 내용을 `plans` 디렉터리의 대응 파일(또는 템플릿)에도 즉시 반영합니다. 임시 지시는 `plans/백로그/아이디어-메모.md`에 기록 후 주기적으로 본문으로 승격합니다.
+- 기획 문서를 업데이트한 뒤에는 관련 규칙과 동기화 여부를 확인하고, 필요 시 `linkedRule` 메타를 최신 상태로 유지합니다.
+
+## rules 디렉터리 레퍼런스
+```
+.cursor/
+└─ rules/
+   ├─ 그룹/
+   │  ├─ 랜딩페이지.mdc
+   │  ├─ 결제-기능.mdc
+   │  ├─ 로그인.mdc
+   │  ├─ 게스트모드.mdc
+   │  ├─ 전역상태관리-zustand.mdc
+   │  ├─ 서버-supabase-mcp.mdc
+   │  ├─ 채팅-AI케플.mdc
+   │  ├─ Dev요청보드.mdc
+   │  ├─ 문서-플로우-공통.mdc
+   │  ├─ 소속기관-관리.mdc
+   │  ├─ 디자인-시스템.mdc
+   │  ├─ 음성녹음.mdc
+   │  └─ 라우트-레이아웃.mdc
+   ├─ 서식/
+   │  ├─ 기초평가_욕구사정기록지.mdc
+   │  ├─ 사례관리회의록.mdc
+   │  ├─ 운영위원회회의록.mdc
+   │  ├─ 급여제공계획서.mdc
+   │  ├─ 서비스일정.mdc
+   │  ├─ 직원회의록.mdc
+   │  └─ 업무수행일지.mdc
+   ├─ 템플릿/
+   │  ├─ 규칙-작성-템플릿.md
+   │  └─ 즉시명령-스니펫.md
+   ├─ 자동화/
+   │  ├─ 인덱스-생성기.md
+   │  └─ 정비-체크리스트.md
+   └─ 백로그/
+      └─ 편입-대기-규칙.mdc
+   ├─ mst_rule.mdc
+```
+
+> ⚠️ 상기 폴더 구조를 기준으로 유지하되, 새로운 기능군이 생기면 그룹/서식 파일을 추가하고 이 마스터 규칙의 매핑 표도 함께 업데이트해야 합니다. `mst_rule.mdc`는 항상 rules 루트에 위치합니다.
+
+## plans 디렉터리 레퍼런스
+```
+.cursor/
+└─ plans/
+   ├─ 개요.mdc
+   ├─ 그룹/
+   │  ├─ 랜딩페이지.md
+   │  ├─ 게스트모드.md
+   │  └─ ...
+   ├─ 서식/
+   │  ├─ 기초평가_욕구사정기록지.md
+   │  ├─ 사례관리회의록.md
+   │  ├─ 운영위원회회의록.md
+   │  ├─ 급여제공계획서.md
+   │  ├─ 서비스일정.md
+   │  ├─ 직원회의록.md
+   │  └─ 업무수행일지.md
+   ├─ 릴리즈노트/
+   │  └─ 2025-Q4.md
+   ├─ 백로그/
+   │  └─ 아이디어-메모.md
+   └─ 템플릿/
+      └─ 기획-문서-템플릿.md
+```
+
+> 기획 문서는 항상 이 디렉터리에 정리하고, 규칙과 연결될 때는 각 문서의 `linkedRule` 메타를 최신 상태로 유지합니다.
+
+## Ver2 개발 시 기존 자산 확인 (필수)
+
+> **⭐ 개발 시작 전 반드시 아래 문서를 확인하세요!**
+
+| 문서 | 설명 |
+|------|------|
+| `.cursor/worklog/2025-12-28-기존자산현황-Ver2재사용가이드.md` | 이미 구현된 Repository/Service/훅/컴포넌트 목록 |
+| `.cursor/worklog/2025-12-23-ver2고민opus.md` | Ver2 전체 기획 및 개발 로드맵 |
+| `.cursor/worklog/2025-12-26-업무수행일지-기획논의.md` | 업무수행일지 상세 기획 |
+
+### 재사용 원칙
+
+1. **새로 만들기 전에 기존 자산을 먼저 확인**
+2. 기존 Repository가 있으면 → 함수 추가로 확장
+3. 기존 훅이 있으면 → 조합하거나 래핑
+4. 기존 컴포넌트가 있으면 → Props 확장
+5. 없을 때만 신규 생성 (동일 폴더 구조 유지)
+
+### 주요 재사용 자산 위치
+
+```
+shared/lib/api/           # Repository/Service (DB CRUD, Edge Function)
+shared/lib/hooks/         # React Query 훅
+features/shared/          # 공통 UI 컴포넌트
+features/document-flows/  # 서식별 폼 컴포넌트
+```
+
+---
+
+## 공통 개발 가이드
+
+### 디자인 시스템 개요
+- careplanner: AI 기반, 현대적·직관적 인터페이스를 유지합니다.
+- longterm-nhis: 공공 표준, 접근성 우선 디자인 원칙을 따릅니다.
+- shared: 공통 모듈 집합이며, Supabase MCP 연동이 완료된 상태를 가정합니다.
+
+### 하드 규칙
+- CSS Modules 강제: 컴포넌트는 폴더 단위(.tsx + .module.css)로 구성합니다.
+- 격리: 기존 `src/`와 종속성을 분리하고 `src_refactoring/` 내 자원만 사용합니다.
+- 글로벌 충돌 금지: 스타일 작성 전 `src_refactoring/careplanner-app/styles/*.css`를 확인합니다.
+- 반응형 기본: 데스크탑·모바일 동시 고려.
+- antd 금지: 남아 있다면 HTML+CSS로 즉시 리팩토링합니다.
+- 스타일 원칙: `!important` 금지, 토큰·유틸리티 우선.
+- 주석: 개발자가 의도를 파악할 수 있도록 필요한 곳에만 작성합니다.
+- API 대비: UI만 구현 중이어도 REST 통신, 로딩, 에러 흐름을 설계합니다.
+- 아이콘: `react-icons`만 사용합니다.
+- 브랜드 컬러: `careplanner-app/styles/variables.css`에서 정의한 CSS 변수만 사용합니다.
+
+### 폴더 요약
+```
+src_refactoring/
+  careplanner-app/   # assets / components / features / hooks / layouts / pages / routes / styles / index.ts
+    features/document-flows/   # basic-assessment, case-meeting, management-meeting, salary-plan, service-schedule, staff-meeting, work-log
+    features/shared/           # ChatPanelContainer, DataInputPanel 등 공통 패널
+  longterm-design-system/
+  shared/            # assets / hooks / lib / types / contexts / data / utils
+  navigation/        # RefactoringAppNavigator.tsx, RequireAuth.tsx
+  assets/
+  main.tsx, vite-env.d.ts
+```
+
+### 설계 철학
+- `components/` 재사용 UI, `features/` 도메인 로직, `pages/` 라우트 화면입니다.
+- `hooks/` 전역 훅, `lib/` API·상수·유틸, `styles/`는 글로벌 선언만 허용합니다.
+
+### 인증/세션
+- Supabase Auth: JWT + Refresh. 클라이언트 옵션은 `autoRefreshToken=true`, `persistSession=true`, `detectSessionInUrl=true`.
+- 보호 라우트는 `navigation/RequireAuth.tsx`로 감싸고 세션이 없으면 `/login`으로 리다이렉트합니다.
+- `/login`: 유효 세션이면 `/main`, 없으면 로그인 상태 유지.
+- 카카오 OAuth: `supabaseAuthService.signInWithKakao({ prompt:'login', redirectTo: VITE_KAKAO_REDIRECT_URI })`.
+- 콜백(`/auth/kakao/callback`): 세션 복구 → member upsert → `/main`.
+- 로그아웃: `signOut()` → `purgeSupabaseAuthStorage()` → 네비 캐시 삭제 → `/login`.
+
+### 타입/DB
+- MCP 생성 타입: `shared/types/supabase.ts`.
+- `createClient<Database>()` 사용, CRUD는 생성 타입 기준으로 수행합니다.
+- 스키마 변경 시 타입을 재생성하여 불일치를 제거합니다.
+
+### 구현 맵(참고 경로)
+- Supabase 클라이언트: `shared/lib/api/supabaseClient.ts`
+- 인증 서비스: `shared/lib/api/supabaseAuthService.ts`
+- 멤버 upsert: `shared/lib/api/memberService.ts`
+- 보호 라우트: `navigation/RequireAuth.tsx`
+- 라우팅: `navigation/RefactoringAppNavigator.tsx`
+- 로그인: `careplanner-app/pages/auth/LoginPage/`
+- OAuth 콜백: `careplanner-app/pages/auth/AuthCallbackPage/`
+- 헤더 로그아웃: `careplanner-app/components/Header/`
+
+### 컴포넌트 스캐폴드 예시
+```
+Button/
+  Button.tsx
+  Button.module.css
+  index.ts
+```
+
+### 네트워크/Effect 최소화
+**데이터 접근 단일화**
+- 컴포넌트/feature 내부에서 `supabase.from(...).select()` 직접 호출 금지 → `shared/lib/api/*` 래퍼 + React Query 훅만 사용합니다.
+- 같은 파라미터 = 같은 `queryKey` 1개만 사용하여 캐시/공유(in-flight dedupe)를 보장합니다.
+- 모든 쿼리는 `enabled` 가드를 둡니다.
+
+**쿼리키 표준 예시**
+- `['user.me']`
+- `['member.byAuth', authUserId]`
+- `['devices.byMember', memberId, deviceUuid ?? null]`
+- `['deviceToken.byDevice', deviceId]`
+- `['chatThreads', memberId]`
+
+**useEffect 사용 가이드**
+- ✅ 구독·타이머·외부 이벤트 한 곳에서 생성 + cleanup.
+- ✅ 데이터 요청은 항상 `useQuery`.
+- ❌ 의존성 배열에 새 객체/함수/배열을 직접 넣지 말고 `useMemo`/`useCallback`으로 고정합니다.
+
+**체인 호출 방지**
+- `member → device → token`을 렌더마다 연쇄 호출하지 말고 각 단계를 독립 `useQuery` + `enabled`로 가드합니다.
+
+**타임스탬프/메타 보존**
+- Supabase insert/update 시 서버 기본값에 의존하지 말고 `new Date().toISOString()` 값을 전달합니다.
+- Optimistic UI는 `metadata.clientId`로 매칭하여 React Query 캐시와 로컬 상태를 동기화합니다.
+
+**입력/검색 트리거**
+- 입력값으로 쿼리키가 바뀔 때는 300–500ms 디바운스된 값만 의존성/쿼리키에 사용합니다.
+
+**실시간(Realtime)**
+- 화면(컨테이너)당 구독 1개만 유지하고 키 변경/언마운트 시 즉시 `unsubscribe`.
+- 수신 이벤트는 스로틀/배치 후 상태 반영(연속 `refetch` 금지).
+
+### 첨부파일 저장 규칙
+- 모든 첨부(채팅/서식/기능별 파일)는 Supabase Storage **`private`** 버킷 내 **`/<섹션>/<memberId>/<contextId>/<파일>`** 구조를 따릅니다.
+  - `memberId`: `member.member_id` (숫자)
+  - `contextId`: 채팅이면 `chatId(chat_thread_id)`, 그 외 플로우는 해당 요청/세션/문서 컨텍스트 ID (예: 기관 가입 신청 requestId)
+- 섹션 디렉터리 규칙:
+  - `main`: 케어플래너 메인 채팅화면
+  - `voice-recording`: 메인 - 음성녹음 파일 저장
+  - `basic-assessment`: 기초평가-욕구사정기록지
+  - `case-meeting`: 사례관리회의록
+  - `management-meeting`: 운영위원회 회의록
+  - `salary-plan`: 급여제공계획서
+  - `service-schedule`: 서비스 일정
+  - `staff-meeting`: 직원 회의록
+  - `work-log`: 업무수행일지
+  - `notice`: 개발 요청 게시판
+  - `member-institution-license`: 소속 기관 가입 신청 첨부(사회복지사 자격증/고유번호증/사업자등록증/장기요양기관 지정서 등)
+- `ChatListSidebar` 및 문서 플로우/기능 모듈에서 동일 규칙을 가정하므로 업로드·다운로드 시 반드시 준수합니다.
+
+### PR 체크리스트(요약)
+- CSS Modules 및 토큰만 사용(글로벌 충돌 없음)
+- 반응형 동작 확인(모바일/데스크탑)
+- antd 미사용 / 기존 antd 제거
+- 접근성: 역할/라벨/포커스 순서 확인
+- 인증 흐름과 보호 라우트 훼손 없음
+- 네이밍·주석으로 의도 전달
+- API 대비: 로딩/에러/빈 상태 UI 존재
+- 컴포넌트에서 직접 Supabase 호출 없음
+- 모든 데이터 훅 `queryKey` 표준/enabled 가드 적용
+- 동일 파라미터 반복 호출이 dedupe로 1회로 수렴

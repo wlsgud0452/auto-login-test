@@ -1,0 +1,73 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e10]:
+    - group "DevTools is now available in Korean!" [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - alert [ref=e18]: DevTools is now available in Korean!
+          - generic [ref=e19]:
+            - button "Always match Chrome's language" [ref=e20]:
+              - generic: Always match Chrome's language
+            - button "Switch DevTools to Korean" [ref=e21]:
+              - generic: Switch DevTools to Korean
+            - button "Don't show again" [ref=e22]:
+              - generic: Don't show again
+        - generic "Close" [ref=e25]:
+          - button "Close" [ref=e26]
+    - generic [ref=e32]:
+      - navigation "Main toolbar" [ref=e33]:
+        - generic [ref=e35]:
+          - generic "Select an element in the page to inspect it" [ref=e36]:
+            - button "Select an element in the page to inspect it - ⌘ ⇧ C" [ref=e37]
+          - generic "Toggle device toolbar" [ref=e39]:
+            - button "Toggle device toolbar - ⌘ ⇧ M" [ref=e40]
+        - generic:
+          - tablist "Panels":
+            - tab "Elements" [selected] [ref=e43]:
+              - generic [ref=e44]: Elements
+            - tab "Console" [ref=e45]:
+              - generic [ref=e46]: Console
+            - tab "Sources" [ref=e47]:
+              - generic [ref=e48]: Sources
+            - tab "Network" [ref=e49]:
+              - generic [ref=e50]: Network
+            - tab "Performance" [ref=e51]:
+              - generic [ref=e52]: Performance
+            - tab "Memory" [ref=e53]:
+              - generic [ref=e54]: Memory
+          - button "More tabs" [ref=e55]
+        - generic [ref=e59]:
+          - generic "Settings" [ref=e61]:
+            - button "Settings - F1 - ⇧ ?" [ref=e62]
+          - button "Customize and control DevTools" [ref=e64]:
+            - button "Customize and control DevTools" [ref=e65]
+          - generic "Close" [ref=e67]:
+            - button "Close" [ref=e68]
+      - tabpanel "Elements panel" [ref=e71]:
+        - generic "elements" [ref=e72]:
+          - generic [ref=e74]:
+            - main "DOM tree explorer" [ref=e79]:
+              - generic [active] [ref=e80]:
+                - generic:
+                  - tree "Page DOM"
+            - generic [ref=e84]:
+              - navigation "Side panel toolbar" [ref=e85]:
+                - generic:
+                  - tablist
+              - complementary "Side panel content" [ref=e86]:
+                - tabpanel "Styles panel" [ref=e87]:
+                  - generic [ref=e94]:
+                    - generic [ref=e98]:
+                      - textbox "Filter" [ref=e103]
+                      - generic "Toggle Element State" [ref=e104]:
+                        - button "Toggle Element State" [ref=e105]
+                      - generic "Element Classes" [ref=e107]:
+                        - button "Element Classes" [ref=e108]
+                      - generic "New Style Rule" [ref=e110]:
+                        - button "New Style Rule" [disabled]
+                    - list
+  - alert [ref=e113]: DevTools is docked to right
+  - alert
+```
