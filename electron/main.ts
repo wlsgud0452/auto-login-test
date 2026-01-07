@@ -85,15 +85,6 @@ async function runLoginAutomation(userNo: string = DEFAULT_USER_NO) {
 
   await automationPage.evaluate(async (val) => {
     const sleepInPage = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-    const waitForElement = async (selector: string, timeout = 7000) => {
-      const start = Date.now();
-      while (Date.now() - start < timeout) {
-        const el = document.querySelector(selector);
-        if (el) return el;
-        await sleepInPage(100);
-      }
-      return null;
-    };
 
     await sleepInPage(2000);
     const input = document.querySelector('input#userNo') as HTMLInputElement | null;
@@ -113,30 +104,47 @@ async function runLoginAutomation(userNo: string = DEFAULT_USER_NO) {
     } else {
       console.log('a#btn_login_A2.btn_pink3 not found');
     }
-
-    // 인증서 다이얼로그 등장 시 암호 입력
-    const dialog = await waitForElement('#xTsign', 7000);
-    if (dialog) {
-      const certPwInput = await waitForElement('input#xwup_certselect_tek_input1.xwup-pw-box', 5000) as HTMLInputElement | null;
-      if (certPwInput) {
-        certPwInput.removeAttribute('readonly');
-        certPwInput.value = DEFAULT_CERT_PW;
-        certPwInput.dispatchEvent(new Event('input', { bubbles: true }));
-        certPwInput.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log('인증서 암호 입력 완료');
-
-        const okBtn = document.querySelector('#xwup_OkButton') as HTMLButtonElement | null;
-        if (okBtn) {
-          okBtn.click();
-          console.log('인증서 확인 버튼 클릭');
-        }
-      } else {
-        console.log('인증서 암호 입력 필드를 찾지 못했습니다.');
-      }
-    } else {
-      console.log('#xTsign dialog not found within timeout');
-    }
   }, escapedUserNo);
+
+  const certFilled = await fillCertPasswordInFrames(automationPage, DEFAULT_CERT_PW, 15000);
+  if (!certFilled) {
+    console.log('인증서 암호 입력 필드를 프레임에서 찾지 못했습니다.');
+  }
+}
+
+async function fillCertPasswordInFrames(page: Page, password: string, timeout = 10000) {
+  const start = Date.now();
+  const fillInFrame = async (target: Page | any) => {
+    const exists = await target.$('input#xwup_certselect_tek_input1.xwup-pw-box');
+    if (!exists) return false;
+    await target.evaluate((pw: string) => {
+      const input = document.querySelector('input#xwup_certselect_tek_input1.xwup-pw-box') as HTMLInputElement | null;
+      if (input) {
+        input.removeAttribute('readonly');
+        input.value = pw;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log('인증서 암호 입력 완료');
+      }
+      const okBtn = document.querySelector('#xwup_OkButton') as HTMLButtonElement | null;
+      if (okBtn) {
+        okBtn.click();
+        console.log('인증서 확인 버튼 클릭');
+      }
+    }, password);
+    return true;
+  };
+
+  while (Date.now() - start < timeout) {
+    // 메인 프레임 우선 시도
+    if (await fillInFrame(page)) return true;
+    const frames = page.frames();
+    for (const frame of frames) {
+      if (await fillInFrame(frame)) return true;
+    }
+    await sleep(200);
+  }
+  return false;
 }
 
 function setupIpcHandlers() {
