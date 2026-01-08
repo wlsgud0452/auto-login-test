@@ -36,8 +36,26 @@ const App: React.FC = () => {
     }
   };
 
-  const handleButtonTwo = () => {
-    setStatus('2번 버튼 기능은 추후 안내 예정입니다.');
+  const handleButtonTwo = async () => {
+    const ipcRenderer = getIpcRenderer();
+
+    if (!ipcRenderer) {
+      setStatus('IPC를 사용할 수 없습니다. Electron 환경을 확인해주세요.');
+      return;
+    }
+
+    setStatus('Playwright로 Chrome(Chromium) 창을 열고 자동 입력을 실행합니다...');
+
+    try {
+      const result = await ipcRenderer.invoke('open-login-automation-playwright');
+      if (result?.success) {
+        setStatus('Playwright: 사용자번호 입력 및 로그인 버튼 클릭을 완료했습니다.');
+      } else {
+        setStatus(result?.message || '실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error: any) {
+      setStatus(`오류가 발생했습니다: ${error?.message || '알 수 없는 오류'}`);
+    }
   };
 
   return (
@@ -47,10 +65,10 @@ const App: React.FC = () => {
 
       <div className={styles.buttonRow}>
         <button className={styles.primaryButton} onClick={handleButtonOne}>
-          1번 버튼: Chrome 열기 + 자동 입력
+          1번 버튼: Puppeteer로 Chrome 열기 + 자동 입력
         </button>
         <button className={styles.secondaryButton} onClick={handleButtonTwo}>
-          2번 버튼: 추후 제공
+          2번 버튼: Playwright로 Chrome 열기 + 자동 입력
         </button>
       </div>
 
